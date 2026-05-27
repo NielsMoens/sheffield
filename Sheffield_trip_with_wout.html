@@ -324,6 +324,49 @@
     transform: rotate(-1.5deg);
   }
 
+  /* BACK LINK + PDF DOWNLOAD BUTTON */
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--bone-soft);
+    padding: 6px 10px; margin-bottom: 28px;
+    border: 1px solid var(--rule);
+    transition: all 0.15s ease;
+  }
+  .back:hover { color: var(--blood); border-color: var(--blood); }
+  .back .arrow { font-family: 'Bebas Neue', sans-serif; font-size: 14px; }
+
+  .pdf-btn {
+    position: fixed;
+    top: 20px; right: 20px;
+    z-index: 1000;
+    background: var(--steel);
+    border: 1.5px solid var(--rule);
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer;
+    color: var(--bone);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+    transition: all 0.15s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .pdf-btn:hover {
+    transform: translate(-1px, -1px);
+    border-color: var(--blood);
+    box-shadow: 3px 3px 0 var(--blood-dark);
+    color: var(--blood);
+  }
+  .pdf-btn .arrow { font-family: 'Bebas Neue', sans-serif; font-size: 16px; line-height: 1; }
+
+  @media print {
+    .pdf-btn, .back { display: none !important; }
+  }
+
   @page { size: A4; margin: 0; }
   .section { break-inside: avoid; page-break-inside: avoid; }
   .page-break { break-before: page; page-break-before: always; }
@@ -340,11 +383,15 @@
     .scenarios.four .card.wout { grid-column: span 1; }
     .params { grid-template-columns: 1fr; gap: 4px 0; }
     .stop { grid-template-columns: 100px 1fr; gap: 16px; }
+    .pdf-btn { top: 12px; right: 12px; padding: 8px 12px; font-size: 9px; }
   }
 </style>
 </head>
 <body>
+<button class="pdf-btn" onclick="window.print()"><span class="arrow">↓</span> Save as PDF</button>
 <div class="page">
+
+  <a class="back" href="index.html"><span class="arrow">←</span> Back to dossier</a>
 
   <!-- HEADER -->
   <div class="header">

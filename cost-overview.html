@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Sheffield Powerlifting Trip · 20 Nov 2026</title>
+<title>Sheffield Powerlifting Trip · Cost Overview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -55,6 +55,21 @@
     padding: 56px 56px 64px;
   }
 
+  /* BACK LINK */
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--bone-soft);
+    padding: 6px 10px; margin-bottom: 28px;
+    border: 1px solid var(--rule);
+    transition: all 0.15s ease;
+  }
+  .back:hover { color: var(--blood); border-color: var(--blood); }
+  .back .arrow { font-family: 'Bebas Neue', sans-serif; font-size: 14px; }
+
   /* HEADER */
   .header {
     border-bottom: 2px solid var(--rule);
@@ -83,7 +98,7 @@
   h1 {
     font-family: 'Bebas Neue', sans-serif;
     font-weight: 400;
-    font-size: 120px;
+    font-size: 96px;
     line-height: 0.88;
     letter-spacing: 0.005em;
     margin-bottom: 22px;
@@ -125,51 +140,44 @@
   }
   body { counter-reset: section; }
 
-  /* TIMELINE */
-  .timeline { position: relative; padding-left: 32px; margin-bottom: 16px; }
-  .timeline::before {
-    content: '';
-    position: absolute; left: 7px; top: 8px; bottom: 8px;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--blood) 0%, var(--plate-dark) 50%, var(--sea) 100%);
-    opacity: 0.6;
+  /* SCENARIO TOGGLE — single cycling button, matches the map */
+  .scenario-toggle {
+    display: flex; align-items: center; gap: 14px;
+    margin-top: 16px; margin-bottom: 8px;
+    flex-wrap: wrap;
   }
-  .stop {
-    position: relative;
-    padding: 12px 0 18px;
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 22px;
-    align-items: baseline;
-  }
-  .stop::before {
-    content: '';
-    position: absolute; left: -32px; top: 20px;
-    width: 16px; height: 16px; border-radius: 50%;
+  .scenario-toggle button {
     background: var(--steel);
-    border: 3px solid var(--blood);
-    box-shadow: 0 0 0 3px var(--void);
-  }
-  .stop.crossing::before { border-color: var(--sea); }
-  .stop.charge::before   { border-color: var(--plate-dark); }
-  .stop.arrive::before   { background: var(--blood); border-color: var(--blood); }
-  .stop-time {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px; font-weight: 700;
+    border: 1.5px solid var(--rule);
     color: var(--bone);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+    transition: all 0.15s ease;
   }
-  .stop-time small {
-    display: block;
-    font-size: 10px; font-weight: 500;
+  .scenario-toggle button:hover {
+    transform: translate(-1px, -1px);
+    border-color: var(--blood);
+    box-shadow: 3px 3px 0 var(--blood-dark);
+  }
+  .scenario-toggle button.active {
+    background: var(--green-bright);
+    border-color: var(--green-bright);
+    color: var(--void);
+    box-shadow: 2px 2px 0 rgba(122,184,92,0.5);
+  }
+  .scenario-toggle .hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--bone-faint);
-    letter-spacing: 0.14em;
-    margin-top: 3px;
   }
-  .stop-text { font-size: 15px; line-height: 1.5; color: var(--bone); }
-  .stop-text em {
-    display: block; font-style: italic;
+  .scenario-note {
+    font-family: 'Fraunces', serif; font-style: italic;
     font-size: 12.5px; color: var(--bone-soft);
-    margin-top: 4px;
+    margin-bottom: 8px;
   }
 
   /* COST CARDS */
@@ -181,6 +189,15 @@
   .scenarios.four .card { padding: 20px 22px 24px; }
   .scenarios.four .card-title { font-size: 16px; margin-bottom: 12px; }
   .scenarios.four .card-total .value { font-size: 28px; }
+  .scenarios.four .card.extra {
+    border: 1.5px solid var(--green-bright);
+    background: rgba(122,184,92,0.08);
+    box-shadow: 4px 4px 0 rgba(122,184,92,0.5);
+  }
+  .scenarios.four .card.extra .card-tag { color: var(--green-bright); }
+  .scenarios.four .card.extra .card-total { border-top-color: var(--green-bright); }
+  .scenarios.four .card.extra .card-total .value { color: var(--green-bright); }
+
   .card {
     background: var(--steel);
     border: 1.5px solid var(--rule);
@@ -313,21 +330,7 @@
     transform: rotate(-1.5deg);
   }
 
-  /* BACK LINK + PDF DOWNLOAD BUTTON */
-  .back {
-    display: inline-flex; align-items: center; gap: 8px;
-    text-decoration: none;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--bone-soft);
-    padding: 6px 10px; margin-bottom: 28px;
-    border: 1px solid var(--rule);
-    transition: all 0.15s ease;
-  }
-  .back:hover { color: var(--blood); border-color: var(--blood); }
-  .back .arrow { font-family: 'Bebas Neue', sans-serif; font-size: 14px; }
-
+  /* PDF DOWNLOAD BUTTON */
   .pdf-btn {
     position: fixed;
     top: 20px; right: 20px;
@@ -352,49 +355,56 @@
   }
   .pdf-btn .arrow { font-family: 'Bebas Neue', sans-serif; font-size: 16px; line-height: 1; }
 
-  @media print {
-    .pdf-btn, .back { display: none !important; }
-  }
-
   @page { size: A4; margin: 0; }
   .section { break-inside: avoid; page-break-inside: avoid; }
-  .page-break { break-before: page; page-break-before: always; }
   h2 { break-after: avoid; page-break-after: avoid; }
-  .card, .stop, .notes { break-inside: avoid; page-break-inside: avoid; }
-  .timeline { break-inside: avoid; page-break-inside: avoid; }
-  .scenarios { break-inside: avoid; page-break-inside: avoid; }
+  .card, .notes { break-inside: avoid; page-break-inside: avoid; }
+  .scenarios, .params { break-inside: avoid; page-break-inside: avoid; }
+
+  @media print {
+    .pdf-btn, .back, .scenario-toggle { display: none !important; }
+    body { background: var(--void) !important; }
+  }
 
   @media (max-width: 740px) {
     .page { padding: 36px 24px 48px; }
-    h1 { font-size: 76px; }
+    h1 { font-size: 64px; }
     .scenarios { grid-template-columns: 1fr; }
     .scenarios.four { grid-template-columns: 1fr; }
     .params { grid-template-columns: 1fr; gap: 4px 0; }
-    .stop { grid-template-columns: 100px 1fr; gap: 16px; }
     .pdf-btn { top: 12px; right: 12px; padding: 8px 12px; font-size: 9px; }
   }
 </style>
 </head>
 <body>
-<button class="pdf-btn" onclick="window.print()"><span class="arrow">↓</span> Save as PDF</button>
 <div class="page">
 
   <a class="back" href="index.html"><span class="arrow">←</span> Back to dossier</a>
+  <button class="pdf-btn" onclick="window.print()"><span class="arrow">↓</span> Save as PDF</button>
 
   <!-- HEADER -->
   <div class="header">
-    <div class="eyebrow">Road Trip Dossier · No. 011</div>
-    <h1>Sheffield</h1>
+    <div class="eyebrow">Road Trip Dossier · No. 011 · Cost Overview</div>
+    <h1>Money <em>&</em> Splits</h1>
     <div class="subline">
       <span><strong>Gent</strong> ⇄ Calais ⇄ Folkestone ⇄ <strong>Sheffield</strong></span>
       <span>20 - 22 NOV 2026</span>
-      <span>NIELS · RUNE · KILIAN · JANY · TESLA MODEL Y LR</span>
+      <span>TESLA MODEL Y LR</span>
     </div>
   </div>
 
-  <!-- THE NUMBERS -->
+  <!-- THE NUMBERS (per scenario) -->
   <div class="section">
   <h2>The Numbers</h2>
+
+  <div class="scenario-toggle">
+    <button id="returnBtn">+ 0 on return</button>
+    <span class="hint">Click to cycle · max 2 (back-seat ceiling)</span>
+  </div>
+  <div class="scenario-note" id="scenarioNote">
+    Base case · Niels + Rune drive home alone. Outbound is always 4 ways.
+  </div>
+
   <div class="scenarios">
 
     <div class="card featured">
@@ -411,8 +421,8 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-tag">Return · 2 People in Car</div>
+    <div class="card" id="returnCard">
+      <div class="card-tag" id="returnTag">Return · 2 People in Car</div>
       <div class="card-title">Sunday 22 Nov · Sheffield → Gent</div>
       <ul class="card-rows">
         <li><span>LeShuttle Short Stay Saver</span><span>€145.00</span></li>
@@ -421,18 +431,18 @@
         <li><span>Subtotal one way</span><span>€192.40</span></li>
       </ul>
       <div class="card-total">
-        <span class="label">split 2 ways</span>
-        <span class="value">€96<small>.20 pp</small></span>
+        <span class="label" id="returnLabel">split 2 ways</span>
+        <span class="value" id="returnTotal">€96<small>.20 pp</small></span>
       </div>
     </div>
 
   </div>
   </div>
 
-  <!-- INDIVIDUAL TOTALS -->
+  <!-- WHO PAYS WHAT -->
   <div class="section">
   <h2>Who Pays What</h2>
-  <div class="scenarios four">
+  <div class="scenarios four" id="whoCards">
 
     <div class="card">
       <div class="card-tag">Kilian pays</div>
@@ -465,12 +475,12 @@
       <div class="card-title">Outbound + Return</div>
       <ul class="card-rows">
         <li><span>Outbound share (1/4)</span><span>€41.64</span></li>
-        <li><span>Return share (1/2)</span><span>€96.20</span></li>
+        <li><span>Return share <span class="rs-frac">(1/2)</span></span><span class="rs-amt">€96.20</span></li>
         <li><span>UK ETA · £16 (if none held)</span><span>€18.72</span></li>
       </ul>
       <div class="card-total">
         <span class="label">Niels total</span>
-        <span class="value">€156<small>.56</small></span>
+        <span class="value rt-total">€156<small>.56</small></span>
       </div>
     </div>
 
@@ -479,132 +489,21 @@
       <div class="card-title">Outbound + Return</div>
       <ul class="card-rows">
         <li><span>Outbound share (1/4)</span><span>€41.64</span></li>
-        <li><span>Return share (1/2)</span><span>€96.20</span></li>
+        <li><span>Return share <span class="rs-frac">(1/2)</span></span><span class="rs-amt">€96.20</span></li>
         <li><span>UK ETA · £16 (if none held)</span><span>€18.72</span></li>
       </ul>
       <div class="card-total">
         <span class="label">Rune total</span>
-        <span class="value">€156<small>.56</small></span>
+        <span class="value rt-total">€156<small>.56</small></span>
       </div>
     </div>
 
-  </div>
-  </div>
-
-  <!-- TIMELINE OUTBOUND -->
-  <div class="section page-break">
-  <h2>Outbound · Fri 20 Nov</h2>
-  <div class="timeline">
-
-    <div class="stop">
-      <div class="stop-time">08:00 <small>CET</small></div>
-      <div class="stop-text">
-        Depart Filaturestraat 2, Gent
-        <em>Battery full from home · 4 pax loaded · coffee in hand</em>
-      </div>
-    </div>
-
-    <div class="stop">
-      <div class="stop-time">10:00 <small>CET</small></div>
-      <div class="stop-text">
-        Arrive LeShuttle terminal, Calais
-        <em>~175 km · check-in opens 4 h before, closes 1 h before departure</em>
-      </div>
-    </div>
-
-    <div class="stop crossing">
-      <div class="stop-time">10:50 <small>CET</small></div>
-      <div class="stop-text">
-        Channel crossing · Calais → Folkestone
-        <em>35 minutes under the sea · stay in the car</em>
-      </div>
-    </div>
-
-    <div class="stop crossing">
-      <div class="stop-time">10:25 <small>UK</small></div>
-      <div class="stop-text">
-        Arrive Folkestone (−1 h timezone)
-        <em>Drive on the left · onto the M20</em>
-      </div>
-    </div>
-
-    <div class="stop charge">
-      <div class="stop-time">~13:00 <small>UK</small></div>
-      <div class="stop-text">
-        Supercharger stop on the M1 (~30 min)
-        <em>Coffee, stretch, ~50 kWh top-up to reach Sheffield</em>
-      </div>
-    </div>
-
-    <div class="stop arrive">
-      <div class="stop-time">15:25 <small>UK</small></div>
-      <div class="stop-text">
-        Arrive hotel · 298 Attercliffe Common, Sheffield S9 2AG
-        <em>Door-to-door: ~8 h 25 min · check in · prep for comp day</em>
-      </div>
-    </div>
-
-  </div>
-  </div>
-
-  <!-- TIMELINE RETURN -->
-  <div class="section">
-  <h2>Return · Sun 22 Nov</h2>
-  <div class="timeline">
-
-    <div class="stop">
-      <div class="stop-time">16:30 <small>UK</small></div>
-      <div class="stop-text">
-        Depart Sheffield hotel
-        <em>Post-comp · early dinner before driving · battery topped up</em>
-      </div>
-    </div>
-
-    <div class="stop charge">
-      <div class="stop-time">~19:00 <small>UK</small></div>
-      <div class="stop-text">
-        Supercharger stop on the M1 (~30 min)
-        <em>Top up enough to reach Folkestone with margin</em>
-      </div>
-    </div>
-
-    <div class="stop">
-      <div class="stop-time">21:25 <small>UK</small></div>
-      <div class="stop-text">
-        Arrive LeShuttle terminal, Folkestone
-        <em>Check-in for 22:25 shuttle · late off-peak slot</em>
-      </div>
-    </div>
-
-    <div class="stop crossing">
-      <div class="stop-time">22:25 <small>UK</small></div>
-      <div class="stop-text">
-        Channel crossing · Folkestone → Calais
-        <em>35 minutes · last segment of the journey</em>
-      </div>
-    </div>
-
-    <div class="stop crossing">
-      <div class="stop-time">00:00 <small>CET</small></div>
-      <div class="stop-text">
-        Arrive Calais (Monday)
-        <em>Quick SC top-up at Calais site if needed</em>
-      </div>
-    </div>
-
-    <div class="stop arrive">
-      <div class="stop-time">~02:00 <small>CET</small></div>
-      <div class="stop-text">
-        Back at Filaturestraat 2, Gent
-        <em>Long day · sleep in Monday · medals counted</em>
-      </div>
-    </div>
-
+    <!-- Extra passengers — added dynamically -->
   </div>
   </div>
 
   <!-- ROUTE PARAMS -->
-  <div class="section page-break">
+  <div class="section">
   <h2>The Route</h2>
   <div class="params">
     <div class="param"><span class="k">Distance one way</span><span class="v">~ 600 km</span></div>
@@ -624,11 +523,11 @@
   <div class="notes">
     <ul>
       <li><strong>LeShuttle pricing</strong> is per vehicle, each way. Booked Short Stay Saver: €144 outbound + €145 return = €289 total. Short Stay Saver applies because the trip is under 5 days.</li>
-      <li><strong>Uneven split:</strong> Niels + Rune + Kilian + Jany drive out together (outbound split 4 ways = €41.64 pp). Only Niels + Rune drive back (return split 2 ways = €96.20 pp). Kilian and Jany only pay for the outbound.</li>
+      <li><strong>Outbound is always split 4 ways</strong> (€41.64 pp). The return split changes if extra passengers join in Sheffield — toggle above to see the breakdown.</li>
       <li><strong>UK ETA</strong> (Electronic Travel Authorisation) is £16 per person, only required if you don't already hold a valid one. ETAs are valid for 2 years or until passport expiry, so if you've been to the UK since April 2025 you may already have one. Apply only via gov.uk or the official UK ETA app - avoid third-party sites that charge extra.</li>
       <li><strong>Round trip math:</strong> 1 200 km and 216 kWh already account for both directions. LeShuttle figures above are the full return.</li>
       <li><strong>Home charge</strong> before departure is counted as free (already on home tariff). Add ~€18 total (~€4.50 pp) if you want to count it at €0.30/kWh.</li>
-      <li><strong>Consumption of 18 kWh/100 km</strong> is realistic for highway driving in November with 4 adults plus luggage. Summer or lighter load lands closer to 16.</li>
+      <li><strong>Back-seat ceiling:</strong> only 2 back seats are available on the return, so you can add at most 2 extra passengers in Sheffield.</li>
       <li><strong>Not included:</strong> hotel, food, drinks, comp entry fee, Sheffield parking, post-comp pints.</li>
       <li><strong>Timezones:</strong> UK is 1 h behind CET in November (no DST in either).</li>
     </ul>
@@ -642,5 +541,109 @@
   </div>
 
 </div>
+
+<script>
+  // Cost model — outbound is always 4-way fixed, return splits with N people in car.
+  // Return total: €192.40 (€145 ferry + €37.60 UK SC + €9.80 EU SC)
+  // Outbound share per outbound rider: €41.64
+  // UK ETA: €18.72
+  const RETURN_TOTAL = 192.40;
+  const ETA = 18.72;
+  const OUTBOUND_SHARE = 41.64;
+
+  const scenarios = {
+    0: {
+      label: '2 in car return',
+      note: 'Base case · Niels + Rune drive home alone. Outbound is always 4 ways.',
+      returnInCar: 2, returnFrac: '(1/2)',
+      extraCards: []
+    },
+    1: {
+      label: '3 in car return',
+      note: '+1 passenger picked up in Sheffield. Return split 3 ways.',
+      returnInCar: 3, returnFrac: '(1/3)',
+      extraCards: [
+        { tag: 'Return passenger pays', title: 'Return only · joins in Sheffield' }
+      ]
+    },
+    2: {
+      label: '4 in car return',
+      note: '+2 passengers picked up in Sheffield (back seats full). Return split 4 ways.',
+      returnInCar: 4, returnFrac: '(1/4)',
+      extraCards: [
+        { tag: 'Return passenger A pays', title: 'Return only · joins in Sheffield' },
+        { tag: 'Return passenger B pays', title: 'Return only · joins in Sheffield' }
+      ]
+    }
+  };
+
+  function fmt(n) {
+    const [int, dec] = n.toFixed(2).split('.');
+    return `€${int}<small>.${dec}</small>`;
+  }
+  function fmtPlain(n) { return `€${n.toFixed(2)}`; }
+
+  function render(extras) {
+    const s = scenarios[extras];
+    const inCar = s.returnInCar;
+    const returnShare = RETURN_TOTAL / inCar;
+
+    // The summary card (Return scenario)
+    document.getElementById('returnTag').textContent = `Return · ${inCar} People in Car`;
+    document.getElementById('returnLabel').textContent = `split ${inCar} ways`;
+    document.getElementById('returnTotal').innerHTML = fmt(returnShare).replace('</small>', ' pp</small>');
+
+    // Scenario note
+    document.getElementById('scenarioNote').textContent = s.note;
+
+    // Toggle active button
+    document.querySelectorAll('.scenario-toggle button').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.extras) === extras);
+    });
+
+    // Niels / Rune cards — update return share row + total
+    const nielsTotal = OUTBOUND_SHARE + returnShare + ETA;
+    document.querySelectorAll('.rs-frac').forEach(el => el.textContent = s.returnFrac);
+    document.querySelectorAll('.rs-amt').forEach(el => el.textContent = fmtPlain(returnShare));
+    document.querySelectorAll('.rt-total').forEach(el => el.innerHTML = fmt(nielsTotal));
+
+    // Remove any previously-rendered extra-passenger cards
+    document.querySelectorAll('.card.extra').forEach(el => el.remove());
+
+    // Add extra passenger cards
+    const wrap = document.getElementById('whoCards');
+    const extraTotal = returnShare + ETA;
+    s.extraCards.forEach(ec => {
+      const card = document.createElement('div');
+      card.className = 'card extra';
+      card.innerHTML = `
+        <div class="card-tag">${ec.tag}</div>
+        <div class="card-title">${ec.title}</div>
+        <ul class="card-rows">
+          <li><span>Return share ${s.returnFrac}</span><span>${fmtPlain(returnShare)}</span></li>
+          <li><span>UK ETA · £16 (if none held)</span><span>€18.72</span></li>
+        </ul>
+        <div class="card-total">
+          <span class="label">${ec.tag.replace(' pays', '')} total</span>
+          <span class="value">${fmt(extraTotal)}</span>
+        </div>
+      `;
+      wrap.appendChild(card);
+    });
+  }
+
+  // Cycling button — 0 → 1 → 2 → 0
+  let currentExtras = 0;
+  const returnBtn = document.getElementById('returnBtn');
+  returnBtn.addEventListener('click', () => {
+    currentExtras = (currentExtras + 1) % 3;
+    returnBtn.textContent = `+ ${currentExtras} on return`;
+    returnBtn.classList.toggle('active', currentExtras > 0);
+    render(currentExtras);
+  });
+
+  // Initial render
+  render(0);
+</script>
 </body>
 </html>

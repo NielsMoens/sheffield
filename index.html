@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sheffield 2026 · Road to the Steel City</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --void: #0c0c0f;
+    --steel: #1a1a1f;
+    --steel-2: #24242b;
+    --rule: #3a3a44;
+    --bone: #f4ede1;
+    --bone-soft: rgba(244,237,225,0.72);
+    --bone-faint: rgba(244,237,225,0.4);
+    --blood: #d63426;
+    --blood-dark: #a8221a;
+    --plate: #c87f3f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--void); color: var(--bone); font-family: 'Fraunces', serif; min-height: 100%; }
+  body {
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(214,52,38,0.18), transparent 55%),
+      radial-gradient(ellipse at 10% 90%, rgba(200,127,63,0.06), transparent 50%),
+      var(--void);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .wrap { position: relative; z-index: 2; max-width: 1240px; margin: 0 auto; padding: 48px 32px 80px; }
+
+  /* ── HERO ───────────────────────────────────────── */
+  .hero { padding: 60px 0 40px; text-align: center; position: relative; }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--blood); margin-bottom: 18px;
+  }
+  .hero-eyebrow .dot { color: var(--bone-faint); margin: 0 8px; }
+
+  .barbell { display: block; margin: 0 auto 28px; width: 320px; max-width: 80vw; opacity: 0.92; }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(82px, 16vw, 220px);
+    line-height: 0.88;
+    letter-spacing: 0.005em;
+    color: var(--bone);
+    text-shadow: 0 0 80px rgba(214,52,38,0.12);
+    position: relative;
+  }
+  .hero h1 .accent { color: var(--blood); }
+  .hero h1::after {
+    content: '';
+    display: block;
+    width: 80px; height: 6px;
+    background: var(--blood);
+    margin: 28px auto 0;
+  }
+  .hero-sub {
+    margin-top: 24px;
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+    font-size: clamp(16px, 2.4vw, 22px);
+    color: var(--bone-soft);
+    max-width: 640px; margin-left: auto; margin-right: auto;
+    line-height: 1.4;
+  }
+  .pills {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px 8px; margin-top: 28px;
+  }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid var(--rule);
+    color: var(--bone-soft);
+    background: rgba(255,255,255,0.02);
+  }
+  .pill.hot { color: var(--blood); border-color: var(--blood-dark); background: rgba(214,52,38,0.08); }
+  .pill.bone { color: var(--bone); border-color: var(--bone); }
+
+  /* ── PRIMARY CARDS ──────────────────────────────── */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--bone-faint);
+    text-align: center; margin: 60px 0 24px;
+    position: relative;
+  }
+  .section-label::before, .section-label::after {
+    content: ''; display: inline-block; width: 40px; height: 1px;
+    background: var(--rule); vertical-align: middle; margin: 0 16px;
+  }
+
+  .primary-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    margin-bottom: 40px;
+  }
+  .card {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: var(--bone);
+    background: var(--steel);
+    border: 1.5px solid var(--rule);
+    padding: 40px 36px;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--blood);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .card:hover {
+    transform: translate(-2px, -2px);
+    border-color: var(--blood);
+    box-shadow: 8px 8px 0 var(--blood-dark);
+  }
+  .card:hover::before { transform: scaleX(1); }
+
+  .card-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--blood); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-eyebrow .num {
+    display: inline-block;
+    border: 1px solid var(--blood);
+    padding: 2px 6px;
+    color: var(--blood);
+  }
+  .card h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px; line-height: 0.9;
+    letter-spacing: 0.01em; color: var(--bone);
+    margin-bottom: 12px;
+  }
+  .card p {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 14px; line-height: 1.5;
+    color: var(--bone-soft); margin-bottom: 24px;
+  }
+  .card .meta {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px;
+  }
+  .card .meta .pill { font-size: 9px; padding: 4px 8px; }
+  .card-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--bone);
+    padding-top: 14px;
+    border-top: 1px dashed var(--rule);
+    transition: color 0.15s ease;
+  }
+  .card:hover .card-cta { color: var(--blood); }
+  .card-cta .arrow {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    line-height: 1; transition: transform 0.2s ease;
+  }
+  .card:hover .card-cta .arrow { transform: translateX(4px); }
+
+  /* ── SECONDARY CARDS ────────────────────────────── */
+  .secondary-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .mini {
+    display: block; text-decoration: none;
+    background: var(--steel-2);
+    border: 1px solid var(--rule);
+    padding: 22px 22px;
+    color: var(--bone);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .mini:hover { border-color: var(--bone-soft); transform: translateY(-2px); }
+  .mini .mini-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--bone-faint); margin-bottom: 8px;
+  }
+  .mini .mini-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px; line-height: 1; letter-spacing: 0.01em;
+    margin-bottom: 6px;
+  }
+  .mini .mini-sub {
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 12px;
+    color: var(--bone-soft); line-height: 1.4;
+  }
+  .mini .mini-fmt {
+    margin-top: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.18em;
+    color: var(--blood);
+  }
+
+  /* ── FOOTER ─────────────────────────────────────── */
+  .footer {
+    margin-top: 72px; padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--bone-faint);
+  }
+  .footer .stamp {
+    color: var(--blood); border: 1px solid var(--blood-dark);
+    padding: 6px 10px; transform: rotate(-1.5deg);
+    background: rgba(214,52,38,0.06);
+  }
+
+  /* ── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 800px) {
+    .wrap { padding: 32px 20px 60px; }
+    .hero { padding: 30px 0 20px; }
+    .primary-grid { grid-template-columns: 1fr; gap: 16px; }
+    .secondary-grid { grid-template-columns: 1fr; }
+    .card { padding: 28px 24px; }
+    .card h2 { font-size: 40px; }
+    .section-label::before, .section-label::after { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-eyebrow">
+      Road Trip Dossier <span class="dot">·</span> No. 011 <span class="dot">·</span> Sheffield Powerlifting Champ. V
+    </div>
+
+    <svg class="barbell" viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- bar -->
+      <rect x="80" y="36" width="440" height="8" fill="#f4ede1" />
+      <!-- left collar -->
+      <rect x="78" y="28" width="12" height="24" fill="#3a3a44" />
+      <!-- right collar -->
+      <rect x="510" y="28" width="12" height="24" fill="#3a3a44" />
+      <!-- left plates (red 25kg style) -->
+      <rect x="58" y="14" width="22" height="52" fill="#d63426" />
+      <rect x="38" y="10" width="22" height="60" fill="#d63426" />
+      <rect x="18" y="6"  width="22" height="68" fill="#d63426" />
+      <!-- right plates -->
+      <rect x="520" y="14" width="22" height="52" fill="#d63426" />
+      <rect x="542" y="10" width="22" height="60" fill="#d63426" />
+      <rect x="564" y="6"  width="22" height="68" fill="#d63426" />
+      <!-- knurling marks on bar -->
+      <g stroke="#0c0c0f" stroke-width="1" opacity="0.6">
+        <line x1="180" y1="36" x2="180" y2="44"/>
+        <line x1="220" y1="36" x2="220" y2="44"/>
+        <line x1="260" y1="36" x2="260" y2="44"/>
+        <line x1="300" y1="36" x2="300" y2="44"/>
+        <line x1="340" y1="36" x2="340" y2="44"/>
+        <line x1="380" y1="36" x2="380" y2="44"/>
+        <line x1="420" y1="36" x2="420" y2="44"/>
+      </g>
+    </svg>
+
+    <h1>SHEF<span class="accent">FIE</span>LD</h1>
+    <p class="hero-sub">
+      The road from Ghent to the Steel City.<br/>
+      Utilita Arena · 21 November 2026 · THE BAR IS LOOOAAADED.
+    </p>
+    <div class="pills">
+      <span class="pill hot">20 — 22 Nov 2026</span>
+      <span class="pill">~1,200 km</span>
+      <span class="pill">Tesla Model Y LR</span>
+      <span class="pill bone">Niels · Rune · Kilian · Jany</span>
+    </div>
+  </header>
+
+  <!-- PRIMARY -->
+  <div class="section-label">The Essentials</div>
+  <div class="primary-grid">
+    <a class="card" href="sheffield-itinerary-map.html">
+      <div class="card-eyebrow"><span class="num">01</span> The Route</div>
+      <h2>ITINERARY<br/>MAP</h2>
+      <p>Three days, four stops, every charger plotted. Tap a day to highlight its leg.</p>
+      <div class="meta">
+        <span class="pill">3 days</span>
+        <span class="pill">Leaflet</span>
+        <span class="pill hot">Interactive</span>
+      </div>
+      <div class="card-cta">Open the map <span class="arrow">→</span></div>
+    </a>
+
+    <a class="card" href="Sheffield_trip_cost_overview.pdf">
+      <div class="card-eyebrow"><span class="num">02</span> The Numbers</div>
+      <h2>COST<br/>OVERVIEW</h2>
+      <p>Ferry, supercharger, ETA — per-person splits for every seat configuration.</p>
+      <div class="meta">
+        <span class="pill">PDF</span>
+        <span class="pill">EUR</span>
+        <span class="pill hot">Per-person</span>
+      </div>
+      <div class="card-cta">Open the dossier <span class="arrow">→</span></div>
+    </a>
+  </div>
+
+  <!-- SECONDARY -->
+  <div class="section-label">Trip Dossiers</div>
+  <div class="secondary-grid">
+    <a class="mini" href="Sheffield_trip_base.html">
+      <div class="mini-tag">Base · 4 → 2</div>
+      <div class="mini-title">FULL ITINERARY</div>
+      <div class="mini-sub">Hour-by-hour breakdown of the outbound and return, Niels + Rune driving home.</div>
+      <div class="mini-fmt">HTML →</div>
+    </a>
+    <a class="mini" href="Sheffield_trip_with_wout.html">
+      <div class="mini-tag">+1 return · 4 → 3</div>
+      <div class="mini-title">EXTRA SEAT</div>
+      <div class="mini-sub">Same trip, one passenger added on the way home. Costs re-split.</div>
+      <div class="mini-fmt">HTML →</div>
+    </a>
+    <a class="mini" href="Sheffield_trip_with_Wout.pdf">
+      <div class="mini-tag">+1 return · printable</div>
+      <div class="mini-title">EXTRA SEAT · PDF</div>
+      <div class="mini-sub">Same as above, in PDF form — easier to send around or print.</div>
+      <div class="mini-fmt">PDF →</div>
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>Ghent · Belgium · 2026</span>
+    <span class="stamp">Send it</span>
+    <span>Tesla Model Y LR · 18 kWh / 100 km</span>
+  </footer>
+
+</div>
+</body>
+</html>

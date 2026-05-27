@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sheffield Powerlifting · Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root {
+    --void: #0c0c0f;
+    --steel: #1a1a1f;
+    --steel-2: #24242b;
+    --rule: #3a3a44;
+    --bone: #f4ede1;
+    --bone-soft: rgba(244,237,225,0.72);
+    --bone-faint: rgba(244,237,225,0.42);
+    --blood: #d63426;
+    --blood-dark: #a8221a;
+    --plate: #f4a261;
+    --plate-dark: #c87f3f;
+    --sea: #5a7a99;
+    --sea-bright: #8ba8c4;
+    --comp: #7ab85c;
+    --comp-dark: #2d5016;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Fraunces', serif;
+    background: var(--void);
+    color: var(--bone);
+    overflow: hidden;
+  }
+  .layout { display: grid; grid-template-columns: 1fr 460px; height: 100vh; position: relative; z-index: 2; }
+  #map { height: 100%; width: 100%; background: #08080b; }
+
+  .sidebar {
+    background: var(--void);
+    border-left: 2px solid var(--rule);
+    overflow-y: auto;
+    padding: 24px 24px 40px;
+    position: relative;
+  }
+  .sidebar::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(214,52,38,0.18), transparent 55%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+  }
+  .sidebar > * { position: relative; z-index: 1; }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--rule); }
+  .sidebar::-webkit-scrollbar-track { background: var(--void); }
+
+  .header { border-bottom: 1px solid var(--rule); padding-bottom: 20px; margin-bottom: 20px; }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--blood);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    font-size: 56px; line-height: 0.88;
+    letter-spacing: 0.005em;
+    color: var(--bone);
+    text-shadow: 0 0 40px rgba(214,52,38,0.15);
+  }
+  h1 em {
+    font-family: 'Fraunces', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 26px;
+    color: var(--bone-faint);
+    letter-spacing: -0.01em;
+    margin: 0 4px;
+  }
+  .subtitle {
+    font-size: 12px; margin-top: 14px;
+    color: var(--bone-soft);
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  }
+  .pill {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--rule);
+    color: var(--bone-soft);
+    padding: 4px 9px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .pill.comp   { color: var(--comp);  border-color: var(--comp);  background: rgba(122,184,92,0.08); }
+  .pill.charge { color: var(--plate); border-color: var(--plate-dark); background: rgba(200,127,63,0.10); }
+  .pill.rest   { color: var(--blood); border-color: var(--blood); background: rgba(214,52,38,0.10); }
+
+  .ev-summary {
+    background: rgba(200,127,63,0.08);
+    border: 1.5px solid var(--plate-dark);
+    padding: 12px 14px; margin-bottom: 14px;
+    box-shadow: 3px 3px 0 rgba(200,127,63,0.35);
+    font-size: 11.5px; line-height: 1.5;
+    color: var(--bone-soft);
+  }
+  .ev-summary strong {
+    color: var(--plate);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
+    display: block; margin-bottom: 5px;
+  }
+
+  .cost-summary {
+    background: var(--steel);
+    border: 1.5px solid var(--rule);
+    padding: 12px 14px; margin-bottom: 18px;
+    box-shadow: 3px 3px 0 var(--blood-dark);
+    font-size: 11.5px; line-height: 1.5;
+    color: var(--bone);
+  }
+  .cost-summary strong {
+    color: var(--blood);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
+    display: block; margin-bottom: 6px;
+  }
+  .cost-summary .row { display: flex; justify-content: space-between; gap: 12px; }
+  .cost-summary .row + .row { margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--rule); }
+  .cost-summary .who { color: var(--bone-soft); font-style: italic; }
+  .cost-summary .amt {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 11.5px;
+    color: var(--bone);
+  }
+  .cost-summary .amt.extra { color: var(--comp); }
+
+  .timeline { position: relative; }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 22px; top: 8px; bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--blood) 0%, var(--plate-dark) 50%, var(--sea) 100%);
+    opacity: 0.5;
+  }
+  .day {
+    display: grid; grid-template-columns: 46px 1fr; gap: 14px;
+    padding: 14px 0; cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .day:hover { background: rgba(214,52,38,0.06); }
+  .day.active { background: rgba(214,52,38,0.12); }
+  .day.active .day-num {
+    background: var(--blood); color: var(--bone); border-color: var(--blood);
+  }
+  .day.has-comp .day-num { border-color: var(--comp); }
+  .day.has-comp.active .day-num { background: var(--comp); border-color: var(--comp); color: var(--void); }
+  .day-num {
+    width: 44px; height: 44px;
+    border: 1.5px solid var(--rule);
+    background: var(--steel);
+    color: var(--bone);
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 11px;
+    line-height: 1; transition: all 0.2s ease;
+    position: relative; z-index: 2;
+  }
+  .day-num .num { font-size: 15px; font-weight: 700; }
+  .day-num .date { font-size: 8px; margin-top: 2px; opacity: 0.7; letter-spacing: 0.06em; }
+  .day-content { padding-top: 2px; }
+  .day-route {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400; font-size: 19px;
+    line-height: 1.15; letter-spacing: 0.01em;
+    margin-bottom: 5px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    color: var(--bone);
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 3px 6px;
+    color: var(--bone);
+  }
+  .badge.comp { background: var(--comp); color: var(--void); }
+  .day-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--bone-faint);
+    margin-bottom: 5px;
+  }
+  .day-meta .km { color: var(--blood); font-weight: 700; }
+  .day-meta .charge-flag { color: var(--plate); font-weight: 700; }
+  .day-desc {
+    font-size: 12px; line-height: 1.5;
+    font-style: italic;
+    color: var(--bone-soft);
+  }
+  .day-desc .charge-stop  { background: rgba(244,162,97,0.16); color: var(--plate);      font-style: normal; font-weight: 600; padding: 0 5px; }
+  .day-desc .shuttle-stop { background: rgba(90,122,153,0.22); color: var(--sea-bright); font-style: normal; font-weight: 600; padding: 0 5px; }
+  .day-desc .comp-stop    { background: rgba(122,184,92,0.18); color: var(--comp);       font-style: normal; font-weight: 600; padding: 0 5px; }
+  .shuttle-day .day-num {
+    background: var(--blood-dark); color: var(--bone); border-color: var(--blood-dark);
+  }
+  .shuttle-day .day-num .date { opacity: 0.85; }
+
+  /* Map markers (drawn on the dark map — light bones to pop) */
+  .stop-marker {
+    width: 26px; height: 26px;
+    background: var(--bone);
+    border: 2px solid var(--steel);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 11px; color: var(--steel);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    transition: all 0.2s ease;
+  }
+  .stop-marker.highlight {
+    background: var(--blood); color: var(--bone); border-color: var(--bone);
+    transform: scale(1.28);
+  }
+  .stop-marker.port {
+    background: var(--steel); color: var(--bone); border: 2px solid var(--bone);
+    border-radius: 4px;
+  }
+  .stop-marker.endpoint {
+    background: var(--blood); color: var(--bone); border: 2px solid var(--bone);
+  }
+  .stop-marker.charge {
+    background: var(--plate); color: var(--void); border: 1.5px solid var(--bone);
+    width: 20px; height: 20px; font-size: 12px; font-weight: 700;
+  }
+
+  .stop-label {
+    background: var(--steel);
+    border: 1px solid var(--blood);
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--bone);
+    white-space: nowrap;
+    box-shadow: 2px 2px 0 var(--blood-dark);
+  }
+  .stop-label.charge {
+    border-color: var(--plate-dark);
+    color: var(--plate);
+    box-shadow: 2px 2px 0 rgba(200,127,63,0.5);
+    font-size: 9px; padding: 2px 7px;
+  }
+  .km-label {
+    background: var(--blood);
+    color: var(--bone);
+    border: 1px solid var(--bone);
+    padding: 2px 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+    white-space: nowrap;
+    box-shadow: 1px 1px 0 var(--void);
+  }
+
+  .leaflet-tooltip-top:before,
+  .leaflet-tooltip-bottom:before,
+  .leaflet-tooltip-left:before,
+  .leaflet-tooltip-right:before { display: none; }
+  .leaflet-container {
+    font-family: 'JetBrains Mono', monospace !important;
+    background: #08080b !important;
+  }
+  .leaflet-control-zoom a {
+    background: var(--steel) !important;
+    color: var(--bone) !important;
+    border-color: var(--rule) !important;
+  }
+  .leaflet-control-zoom a:hover {
+    background: var(--blood) !important;
+    color: var(--bone) !important;
+  }
+
+  .legend {
+    margin-top: 18px; padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    display: flex; flex-wrap: wrap; gap: 10px 14px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-style: italic;
+    color: var(--bone-soft);
+  }
+  .legend-line { width: 20px; height: 0; border-top: 2.5px solid; }
+  .legend-line.dashed { border-top-style: dashed; }
+
+  .compass {
+    position: absolute; top: 20px; left: 20px;
+    width: 56px; height: 56px;
+    z-index: 1000; pointer-events: none;
+    opacity: 0.85;
+  }
+
+  .map-overlay {
+    position: absolute; bottom: 20px; left: 20px;
+    z-index: 1000;
+    background: var(--steel);
+    border: 1.5px solid var(--rule);
+    padding: 12px 16px;
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 12px; max-width: 320px;
+    color: var(--bone-soft);
+    box-shadow: 4px 4px 0 var(--blood-dark);
+  }
+  .map-overlay strong {
+    font-style: normal; font-weight: 600;
+    color: var(--bone); letter-spacing: 0.005em;
+  }
+  .map-overlay .note {
+    display: block; margin-top: 5px;
+    font-size: 10px; font-style: normal;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+  }
+  .map-overlay .note.charge  { color: var(--plate); }
+  .map-overlay .note.shuttle { color: var(--sea-bright); }
+
+  .toggle-btn {
+    position: absolute; z-index: 1000;
+    background: var(--steel);
+    border: 1.5px solid var(--rule);
+    padding: 9px 15px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+    transition: all 0.15s ease;
+    color: var(--bone);
+  }
+  .toggle-btn:hover {
+    transform: translate(-1px, -1px);
+    border-color: var(--blood);
+    box-shadow: 3px 3px 0 var(--blood-dark);
+  }
+  .toggle-btn.active {
+    background: var(--plate);
+    border-color: var(--plate-dark);
+    box-shadow: 2px 2px 0 rgba(200,127,63,0.5);
+    color: var(--void);
+  }
+  #toggleChargers { top: 20px; right: 20px; }
+  #toggleReturn { top: 20px; right: 175px; }
+  #toggleReturn.active {
+    background: var(--comp);
+    border-color: var(--comp);
+    box-shadow: 2px 2px 0 rgba(122,184,92,0.5);
+    color: var(--void);
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; grid-template-rows: 50vh 50vh; }
+    .sidebar { border-left: none; border-top: 2px solid var(--rule); padding: 18px; }
+    h1 { font-size: 44px; }
+    .map-overlay, .toggle-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div style="position: relative;">
+    <div id="map"></div>
+    <svg class="compass" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="#f4ede1" stroke-width="1"/>
+      <circle cx="30" cy="30" r="20" fill="none" stroke="#f4ede1" stroke-width="0.5"/>
+      <path d="M30 8 L33 30 L30 32 L27 30 Z" fill="#d63426"/>
+      <path d="M30 52 L33 30 L30 28 L27 30 Z" fill="#f4ede1"/>
+      <text x="30" y="6" text-anchor="middle" font-family="Fraunces" font-size="6" font-weight="800" fill="#f4ede1">N</text>
+    </svg>
+    <button class="toggle-btn" id="toggleReturn">+ 0 on return</button>
+    <button class="toggle-btn active" id="toggleChargers">⚡ Chargers ON</button>
+    <div class="map-overlay">
+      <strong>Tap a day</strong> to highlight its leg with km.
+      <span class="note shuttle">— Blue dashed = LeShuttle (Eurotunnel)</span>
+      <span class="note charge">⚡ Orange = Tesla Supercharger</span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="header">
+      <div class="eyebrow">Tesla Model Y LR · Dossier No. 011</div>
+      <h1>Sheffield <em>by</em> Road</h1>
+      <div class="subtitle">
+        <span class="pill">20-22 Nov 2026</span>
+        <span class="pill charge">~1,200 km</span>
+        <span class="pill comp">Powerlifting</span>
+        <span class="pill rest">Niels · Rune · Kilian · Jany</span>
+      </div>
+    </div>
+
+    <div class="ev-summary">
+      <strong>⚡ Charging stops</strong>
+      Trowell M1 outbound (~50 kWh · coffee, stretch) · Trowell M1 return (~80 kWh · top-up to ferry) · Calais quick top-up on the EU side if needed.
+    </div>
+
+    <div class="cost-summary" id="costSummary">
+      <strong>Per-person · Ferry + Charging</strong>
+      <div class="row"><span class="who">Kilian / Jany (outbound only)</span><span class="amt">€60.36</span></div>
+      <div class="row"><span class="who" id="whoRound">Niels / Rune (round-trip · 2 in car)</span><span class="amt" id="amtRound">€156.56</span></div>
+      <div class="row" id="rowExtra" style="display:none;"><span class="who" id="whoExtra">Return passenger</span><span class="amt extra" id="amtExtra">€82.85</span></div>
+    </div>
+
+    <div class="timeline" id="timeline"></div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-line" style="color: #d63426;"></div><span>Drive</span></div>
+      <div class="legend-item"><div class="legend-line dashed" style="color: #5a7a99;"></div><span>LeShuttle</span></div>
+      <div class="legend-item"><span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#f4ede1; border:1.5px solid #3a3a44;"></span><span>Overnight</span></div>
+      <div class="legend-item"><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#f4a261; border:1.5px solid #c87f3f;"></span><span>Supercharger</span></div>
+      <div class="legend-item"><span style="display:inline-block; width:12px; height:12px; background:#1a1a1f; border:1.5px solid #f4ede1; border-radius:3px;"></span><span>Shuttle terminal</span></div>
+      <div class="legend-item"><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#7ab85c;"></span><span>Comp day</span></div>
+    </div>
+  </aside>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const c = {
+    ghent:      [51.0543,  3.7174],
+    calais:     [50.9450,  1.8083],
+    folkestone: [51.0941,  1.1330],
+    sheffield:  [53.3938, -1.4226]
+  };
+
+  const superchargers = [
+    { name: 'Calais',          pos: [50.952,  1.866] },
+    { name: 'Folkestone',      pos: [51.110,  1.130] },
+    { name: 'South Mimms',     pos: [51.692, -0.220] },
+    { name: 'Leicester Fst E', pos: [52.640, -1.215] },
+    { name: 'Trowell',         pos: [52.972, -1.271] }
+  ];
+
+  const days = [
+    {
+      n: '0', date: 'Fri 20', label: 'Ghent → Calais → Sheffield',
+      meta: '<span class="km">~700 km</span> · 8h 25 · 10:50 LeShuttle · <span class="charge-flag">⚡ Trowell</span>',
+      shuttle: true,
+      desc: 'Depart 08:00 from Gent. <span class="shuttle-stop">Calais LeShuttle</span> 10:00 check-in, 10:50 crossing — stay in the car. <span class="charge-stop">⚡ Trowell M1</span> ~50 kWh, coffee + stretch. Hotel check-in 15:25 UK (16:25 CET).',
+      segs: [
+        { type: 'drive',   path: [c.ghent, [51.04, 3.21], [50.97, 2.30], c.calais], midpoint: [51.00, 2.75], km: '175 km' },
+        { type: 'shuttle', path: [c.calais, c.folkestone] },
+        { type: 'drive',   path: [c.folkestone, [51.30, 0.50], [51.55, -0.30], [52.30, -0.95], [52.97, -1.27], [53.20, -1.35], c.sheffield], midpoint: [52.30, -1.05], km: '475 km' }
+      ],
+      overnightKey: 'sheffield'
+    },
+    {
+      n: '1', date: 'Sat 21', label: 'Sheffield · Competition Day',
+      meta: 'Zero km · weigh-in · lift · medals',
+      comp: true,
+      desc: '<span class="comp-stop">Powerlifting comp</span> on the platform. Recovery and post-comp pints at the hotel in the evening. Battery rests too.',
+      segs: [],
+      overnightKey: 'sheffield'
+    },
+    {
+      n: '2', date: 'Sun 22', label: 'Sheffield → Calais → Ghent',
+      meta: '<span class="km">~700 km</span> · 9.5h · 22:25 LeShuttle · <span class="charge-flag">⚡ Trowell</span>',
+      shuttle: true,
+      desc: 'Depart 16:30 with battery topped up. <span class="charge-stop">⚡ Trowell M1</span> southbound ~80 kWh. <span class="shuttle-stop">Folkestone LeShuttle</span> 21:25 check-in → 22:25 crossing → 00:00 CET Calais. Optional <span class="charge-stop">⚡ Calais</span> top-up. Home in Ghent ~02:00 Mon. Sleep in.',
+      segs: [
+        { type: 'drive',   path: [c.sheffield, [53.20, -1.35], [52.97, -1.27], [52.30, -0.95], [51.55, -0.30], [51.30, 0.50], c.folkestone], midpoint: [52.30, -1.05], km: '475 km' },
+        { type: 'shuttle', path: [c.folkestone, c.calais] },
+        { type: 'drive',   path: [c.calais, [50.97, 2.30], [51.04, 3.21], c.ghent], midpoint: [51.00, 2.75], km: '175 km' }
+      ]
+    }
+  ];
+
+  const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([52.2, 0.5], 6);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19, subdomains: 'abcd'
+  }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19, subdomains: 'abcd', opacity: 0.7
+  }).addTo(map);
+
+  const dayLayers = {};
+  const kmLabels = {};
+  days.forEach((d, i) => {
+    const group = L.layerGroup();
+    const labels = [];
+    d.segs.forEach(seg => {
+      let color, weight, dash;
+      if (seg.type === 'shuttle')    { color = '#5a7a99'; weight = 3;   dash = '6, 8'; }
+      else                           { color = '#d63426'; weight = 3.5; dash = null; }
+      L.polyline(seg.path, {
+        color, weight, opacity: 0.5, dashArray: dash,
+        lineCap: 'round', lineJoin: 'round'
+      }).addTo(group);
+      if (seg.midpoint && seg.km) {
+        const labelIcon = L.divIcon({
+          className: '',
+          html: `<div class="km-label">${seg.km}</div>`,
+          iconSize: [null, null]
+        });
+        const labelMarker = L.marker(seg.midpoint, { icon: labelIcon, interactive: false, opacity: 0 });
+        labels.push(labelMarker);
+      }
+    });
+    group.addTo(map);
+    dayLayers[i] = group;
+    kmLabels[i] = labels;
+  });
+
+  const chargerLayer = L.layerGroup();
+  superchargers.forEach(sc => {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="stop-marker charge">⚡</div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    const m = L.marker(sc.pos, { icon, zIndexOffset: 200 });
+    m.bindTooltip(sc.name, { direction: 'top', offset: [0, -10], className: 'stop-label charge' });
+    m.addTo(chargerLayer);
+  });
+  chargerLayer.addTo(map);
+
+  const stops = [
+    { key: 'ghent',      label: 'Ghent',      type: 'endpoint', dir: 'bottom', showNum: '★' },
+    { key: 'calais',     label: 'Calais',     type: 'port',     dir: 'bottom' },
+    { key: 'folkestone', label: 'Folkestone', type: 'port',     dir: 'right' },
+    { key: 'sheffield',  label: 'Sheffield',  type: 'endpoint', dir: 'top',    showNum: '0-1' }
+  ];
+
+  const markerByKey = {};
+  stops.forEach(s => {
+    const latlng = c[s.key];
+    let cls = 'stop-marker';
+    let inner = '';
+    if (s.type === 'port')          { cls += ' port';     inner = '⚓'; }
+    else if (s.type === 'endpoint') { cls += ' endpoint'; inner = (s.showNum || '★'); }
+    else { inner = s.showNum; }
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="${cls}" data-stop="${s.key}">${inner}</div>`,
+      iconSize: [26, 26], iconAnchor: [13, 13]
+    });
+
+    const m = L.marker(latlng, { icon, zIndexOffset: 300 }).addTo(map);
+    const offset = s.dir === 'right'  ? [16, 0]
+                 : s.dir === 'left'   ? [-16, 0]
+                 : s.dir === 'bottom' ? [0, 16]
+                 : [0, -16];
+    m.bindTooltip(s.label, { permanent: true, direction: s.dir, offset, className: 'stop-label' });
+    markerByKey[s.key] = m;
+  });
+
+  map.fitBounds(L.latLngBounds([c.ghent, c.sheffield, c.calais, c.folkestone]), { padding: [60, 60] });
+
+  const toggleBtn = document.getElementById('toggleChargers');
+  let chargersVisible = true;
+  toggleBtn.addEventListener('click', () => {
+    chargersVisible = !chargersVisible;
+    if (chargersVisible) {
+      chargerLayer.addTo(map);
+      toggleBtn.classList.add('active');
+      toggleBtn.textContent = '⚡ Chargers ON';
+    } else {
+      map.removeLayer(chargerLayer);
+      toggleBtn.classList.remove('active');
+      toggleBtn.textContent = '⚡ Chargers OFF';
+    }
+  });
+
+  const returnBtn  = document.getElementById('toggleReturn');
+  const amtRoundEl = document.getElementById('amtRound');
+  const whoRoundEl = document.getElementById('whoRound');
+  const rowExtraEl = document.getElementById('rowExtra');
+  const amtExtraEl = document.getElementById('amtExtra');
+  const whoExtraEl = document.getElementById('whoExtra');
+
+  // Max 2 extra return passengers (only 2 back seats available on the way home).
+  const returnStates = [
+    { extras: 0, btn: '+ 0 on return', roundWho: 'Niels / Rune (round-trip · 2 in car)', round: '€156.56', extraWho: null,                                 extraAmt: null     },
+    { extras: 1, btn: '+ 1 on return', roundWho: 'Niels / Rune (round-trip · 3 in car)', round: '€124.49', extraWho: 'Return passenger',                  extraAmt: '€82.85' },
+    { extras: 2, btn: '+ 2 on return', roundWho: 'Niels / Rune (round-trip · 4 in car)', round: '€108.46', extraWho: 'Return passengers · each (×2)',     extraAmt: '€66.82' }
+  ];
+  let returnIdx = 0;
+  returnBtn.addEventListener('click', () => {
+    returnIdx = (returnIdx + 1) % returnStates.length;
+    const s = returnStates[returnIdx];
+    returnBtn.textContent = s.btn;
+    returnBtn.classList.toggle('active', s.extras > 0);
+    whoRoundEl.textContent = s.roundWho;
+    amtRoundEl.textContent = s.round;
+    if (s.extraAmt) {
+      rowExtraEl.style.display = 'flex';
+      whoExtraEl.textContent = s.extraWho;
+      amtExtraEl.textContent = s.extraAmt;
+    } else {
+      rowExtraEl.style.display = 'none';
+    }
+  });
+
+  const timelineEl = document.getElementById('timeline');
+  days.forEach((d, i) => {
+    const el = document.createElement('div');
+    el.className = 'day' + (d.shuttle ? ' shuttle-day' : '') + (d.comp ? ' has-comp' : '');
+    el.dataset.idx = i;
+    const badge = d.comp ? '<span class="badge comp">🏋 Comp</span>' : '';
+    el.innerHTML = `
+      <div class="day-num">
+        <span class="num">${d.n}</span>
+        <span class="date">${d.date.split(' ')[1]}</span>
+      </div>
+      <div class="day-content">
+        <div class="day-route"><span>${d.label}</span>${badge}</div>
+        <div class="day-meta">${d.meta}</div>
+        <div class="day-desc">${d.desc}</div>
+      </div>
+    `;
+    el.addEventListener('click', () => highlightDay(i));
+    timelineEl.appendChild(el);
+  });
+
+  let activeIdx = null;
+  let visibleLabels = [];
+
+  function clearLabels() {
+    visibleLabels.forEach(l => map.removeLayer(l));
+    visibleLabels = [];
+  }
+
+  function highlightDay(idx) {
+    if (activeIdx === idx) {
+      activeIdx = null;
+      document.querySelectorAll('.day').forEach(el => el.classList.remove('active'));
+      Object.values(dayLayers).forEach(g => {
+        g.eachLayer(p => {
+          p.setStyle({ opacity: 0.5, weight: p.options.dashArray ? 3 : 3.5 });
+        });
+      });
+      document.querySelectorAll('.stop-marker').forEach(m => m.classList.remove('highlight'));
+      clearLabels();
+      return;
+    }
+
+    activeIdx = idx;
+    document.querySelectorAll('.day').forEach((el, i) => el.classList.toggle('active', i === idx));
+
+    Object.entries(dayLayers).forEach(([i, g]) => {
+      g.eachLayer(p => {
+        if (parseInt(i) === idx) {
+          p.setStyle({ opacity: p.options.dashArray ? 0.9 : 1, weight: p.options.dashArray ? 4.5 : 5.5 });
+          p.bringToFront();
+        } else {
+          p.setStyle({ opacity: 0.15, weight: p.options.dashArray ? 3 : 3.5 });
+        }
+      });
+    });
+
+    clearLabels();
+    if (kmLabels[idx]) {
+      kmLabels[idx].forEach(lm => { lm.setOpacity(1); lm.addTo(map); visibleLabels.push(lm); });
+    }
+
+    document.querySelectorAll('.stop-marker').forEach(m => m.classList.remove('highlight'));
+    const day = days[idx];
+    if (day.overnightKey && markerByKey[day.overnightKey]) {
+      const mEl = markerByKey[day.overnightKey].getElement();
+      if (mEl) { const dot = mEl.querySelector('.stop-marker'); if (dot) dot.classList.add('highlight'); }
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 /* Service worker for the Sheffield 2026 trip dossier.
    Bump VERSION whenever a page or icon changes, so the old cache is dropped. */
-var VERSION = 'v1';
+var VERSION = 'v2';
 var SHELL_CACHE = 'sheffield-shell-' + VERSION;
 var RUNTIME_CACHE = 'sheffield-runtime-' + VERSION;
 

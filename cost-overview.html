@@ -459,6 +459,11 @@
   @media (max-width: 560px) {
     .section .scenario-toggle .hint { font-size: 11px; line-height: 1.5; }
   }
+
+  /* decorative overflow guard: fixed/pseudo layers and the clamp()ed hero can
+     push the scroll width past the viewport before the web font settles, which
+     shows up as a stray sideways scroll on a phone */
+  html { overflow-x: hidden; }
 </style>
 </head>
 <body>

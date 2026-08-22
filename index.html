@@ -265,6 +265,11 @@
     .secondary-grid .mini .mini-tag,
     .secondary-grid .mini .mini-fmt { font-size: 10.5px; }
   }
+
+  /* decorative overflow guard: fixed/pseudo layers and the clamp()ed hero can
+     push the scroll width past the viewport before the web font settles, which
+     shows up as a stray sideways scroll on a phone */
+  html { overflow-x: hidden; }
 </style>
 </head>
 <body>

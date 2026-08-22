@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0c0c0f" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Sheffield 2026" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <title>Sheffield Powerlifting · Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,7 +42,7 @@
     color: var(--bone);
     overflow: hidden;
   }
-  .layout { display: grid; grid-template-columns: 1fr 460px; height: 100vh; position: relative; z-index: 2; }
+  .layout { display: grid; grid-template-columns: 1fr 460px; height: 100vh; height: 100dvh; position: relative; z-index: 2; }
   #map { height: 100%; width: 100%; background: #08080b; }
 
   .sidebar {
@@ -366,6 +374,35 @@
     h1 { font-size: 44px; }
     .map-overlay, .toggle-btn { display: none; }
   }
+
+  /* ---- phone refinements ---------------------------------------------- */
+  /* dvh tracks the shrinking/growing mobile address bar; vh does not, which
+     left the bottom of the itinerary cut off behind browser chrome */
+  @media (max-width: 900px) {
+    .layout { height: 100dvh; grid-template-rows: 42dvh 58dvh; }
+  }
+  @media (max-width: 560px) {
+    .pill, .pill.charge, .pill.comp, .pill.rest { font-size: 11px; padding: 3px 8px; }
+    .day-meta, .km, .charge-flag { font-size: 11px; }
+    .date { font-size: 10px; }
+    .badge, .badge.comp { font-size: 10px; }
+    .ev-summary, .cost-summary, .row, .who, .amt { font-size: 12px; }
+    .ev-summary strong, .cost-summary strong { font-size: 12px; }
+    .legend-item, .legend-line, .legend-line.dashed { font-size: 11px; }
+    .sidebar { padding: 16px 14px 28px; }
+    /* Leaflet's touch build sets 30px via `.leaflet-touch .leaflet-bar a`,
+       which outranks a single-class selector, so match that specificity */
+    .leaflet-touch .leaflet-control-zoom a,
+    .leaflet-control-zoom a {
+      width: 40px; height: 40px; line-height: 40px; font-size: 20px;
+    }
+  }
+
+  /* ---- phone refinements, specificity pass ---- */
+  @media (max-width: 560px) {
+    .sidebar .header .eyebrow { font-size: 11px; }
+    .day-content .day-route .badge.comp { font-size: 10.5px; }
+  }
 </style>
 </head>
 <body>
@@ -674,6 +711,13 @@
       const mEl = markerByKey[day.overnightKey].getElement();
       if (mEl) { const dot = mEl.querySelector('.stop-marker'); if (dot) dot.classList.add('highlight'); }
     }
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
   }
 </script>
 </body>

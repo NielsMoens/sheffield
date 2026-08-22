@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0c0c0f" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Sheffield 2026" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <title>Sheffield 2026 · Road to the Steel City</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -236,6 +244,27 @@
     .card h2 { font-size: 40px; }
     .section-label::before, .section-label::after { display: none; }
   }
+
+  /* ---- phone refinements ---------------------------------------------- */
+  @media (max-width: 560px) {
+    .pill, .pill.hot, .pill.bone { font-size: 11px; padding: 5px 9px; }
+    .card-eyebrow, .num { font-size: 11px; }
+    .mini-tag, .mini-fmt { font-size: 10.5px; }
+    .footer, .footer span, .stamp { font-size: 11px; }
+    .hero-eyebrow, .section-label { font-size: 11px; }
+    /* the card call-to-action is the main navigation on this page */
+    .card-cta { font-size: 12px; min-height: 44px; display: inline-flex; align-items: center; }
+  }
+  @media (max-width: 400px) {
+    h1 { font-size: 64px; }
+  }
+
+  /* ---- phone refinements, specificity pass ---- */
+  @media (max-width: 560px) {
+    .card .meta .pill { font-size: 11px; padding: 4px 9px; }
+    .secondary-grid .mini .mini-tag,
+    .secondary-grid .mini .mini-fmt { font-size: 10.5px; }
+  }
 </style>
 </head>
 <body>
@@ -340,5 +369,12 @@
   </footer>
 
 </div>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
 </body>
 </html>

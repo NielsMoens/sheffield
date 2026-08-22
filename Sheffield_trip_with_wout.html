@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0c0c0f" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Sheffield 2026" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <title>Sheffield Powerlifting Trip · 20 Nov 2026 · with Wout</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -385,6 +394,34 @@
     .stop { grid-template-columns: 100px 1fr; gap: 16px; }
     .pdf-btn { top: 12px; right: 12px; padding: 8px 12px; font-size: 9px; }
   }
+
+  /* ---- phone refinements ---------------------------------------------- */
+  @media (max-width: 560px) {
+    /* the 9-11px tracking labels are legible on a desktop but not at arm's
+       length on a phone, so lift the floor without changing the type system */
+    .eyebrow { font-size: 11px; }
+    .card-tag { font-size: 11px; }
+    .k { font-size: 11.5px; }
+    .card-rows li small, .card-total small { font-size: 11px; }
+    .footer, .footer span, .stamp { font-size: 11px; }
+
+    /* thumb-sized controls (were ~30px tall) */
+    .back, .pdf-btn {
+      min-height: 44px;
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 10px 14px; font-size: 11px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 56px; }
+    .stop { grid-template-columns: 84px 1fr; gap: 12px; }
+  }
+
+  /* ---- phone refinements, specificity pass ---- */
+  @media (max-width: 560px) {
+    .stop .stop-time small { font-size: 11px; }
+  }
 </style>
 </head>
 <body>
@@ -667,5 +704,12 @@
   </div>
 
 </div>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
 </body>
 </html>
